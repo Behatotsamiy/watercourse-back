@@ -9,9 +9,10 @@ import { PaymentsModule } from './payments/payments.module';
 import { CoursesModule } from './courses/courses.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { ScheduleModule } from './schedule/schedule.module';
-import { User } from './users/entities/user.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './users/entities/user.entity';
+
 
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true }),
