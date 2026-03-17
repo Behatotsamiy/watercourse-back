@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum UserRole {
   OWNER = 'owner',
@@ -8,11 +8,17 @@ export enum UserRole {
 
 @Entity('users')
 export class User extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string
+  
   @Column({ unique: true })
   phone: string;
 
   @Column({ select: false })
   password: string;
+
+  @Column({ nullable: true, select: false }) 
+  refreshToken: string | null;
 
   @Column()
   firstName: string;
