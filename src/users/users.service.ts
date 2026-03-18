@@ -22,6 +22,7 @@ export class UsersService {
       ...dto,
       password: hashedPassword,
      owner: ownerId ? ({ id: ownerId }) : null,
+    
     });
     const savedUser = await this.userRepository.save(newUser);
     delete savedUser.password;
