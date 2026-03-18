@@ -38,7 +38,7 @@ export class AuthService {
     const passwordMatch = await bcrypt.compare(dto.password, user.password);
     if (!passwordMatch) throw new UnauthorizedException('Неверный номер или пароль');
 
-    const tokens = await this.generateTokens(user.id, user.phone);
+    const tokens = await this.generateTokens(user.id, user.phone, user.role);
     await this.saveRefreshToken(user.id, tokens.refreshToken);
 
     delete user.password;
@@ -53,7 +53,7 @@ export class AuthService {
 
   // ─── Обновление токенов ────────────────────────────────────────
   async refreshTokens(userId: string) {
-    const tokens = await this.generateTokens(userId, '');
+    const tokens = await this.generateTokens(userId, '', '');
     await this.saveRefreshToken(userId, tokens.refreshToken);
     return tokens;
   }
@@ -74,13 +74,13 @@ export class AuthService {
   }
 
   // ─── Вспомогательные методы ────────────────────────────────────
-  private async generateTokens(userId: string, phone: string) {
-    const payload = { sub: userId, phone };
+  private async generateTokens(userId: string, phone: string, role: string) {
+    const payload = { sub: userId, phone, role };
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: process.env.JWT_SECRET,
-        expiresIn: '15m',
+        expiresIn: '7d',
       }),
       this.jwtService.signAsync(payload, {
         secret: process.env.JWT_REFRESH_SECRET,

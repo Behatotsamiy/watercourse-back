@@ -3,6 +3,7 @@ import {
   BaseEntity,
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -37,9 +38,15 @@ export class User extends BaseEntity {
   @Column({ type: 'enum', enum: UserRole })
   role: UserRole;
 
+    @Column({ nullable: true })
+  ownerId: string;
+
   // Если юзер — это Admin или Teacher, он "принадлежит" какому-то Owner-у
   @ManyToOne(() => User, (user) => user.staff, { nullable: true })
+   @JoinColumn({ name: 'ownerId' })
   owner: User;
+
+
 
   // Если юзер — это Owner, у него есть список сотрудников (staff)
   @OneToMany(() => User, (user) => user.owner)
