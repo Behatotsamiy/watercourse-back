@@ -1,26 +1,45 @@
-import { Injectable } from '@nestjs/common';
+// payments.service.ts
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Payment } from './entities/payment.entity';
 import { CreatePaymentDto } from './dto/create-payment.dto';
-import { UpdatePaymentDto } from './dto/update-payment.dto';
 
 @Injectable()
 export class PaymentsService {
-  create(createPaymentDto: CreatePaymentDto) {
-    return 'This action adds a new payment';
+  constructor(
+    @InjectRepository(Payment)
+    private paymentRepository: Repository<Payment>,
+  ) {}
+
+  async create(dto: CreatePaymentDto) {
+    const payment = this.paymentRepository.create({
+      amount: dto.amount,
+      method: dto.method,
+      comment: dto.comment,
+      student: { id: dto.studentId },
+    });
+    return this.paymentRepository.save(payment);
   }
 
-  findAll() {
-    return `This action returns all payments`;
+  async findByStudent(studentId: string) {
+    return this.paymentRepository.find({
+      where: { student: { id: studentId } },
+      order: { createdAt: 'DESC' },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} payment`;
+  async findAll() {
+    return this.paymentRepository.find({
+      relations: ['student'],
+      order: { createdAt: 'DESC' },
+    });
   }
 
-  update(id: number, updatePaymentDto: UpdatePaymentDto) {
-    return `This action updates a #${id} payment`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} payment`;
+  async remove(id: string) {
+    const payment = await this.paymentRepository.findOne({ where: { id } });
+    if (!payment) throw new NotFoundException('Платёж не найден');
+    await this.paymentRepository.remove(payment);
+    return { message: 'Платёж удалён' };
   }
 }

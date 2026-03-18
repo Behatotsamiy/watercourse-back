@@ -1,34 +1,37 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, UseGuards } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
-import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { JwtAuthGuard } from '../_auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../_auth/guards/roles.guard';
+import { Roles } from '../_auth/decorators/roles.decorator';
+import { UserRole } from '../users/entities/user.entity';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
+  @Roles(UserRole.OWNER, UserRole.ADMIN)
   @Post()
-  create(@Body() createPaymentDto: CreatePaymentDto) {
-    return this.paymentsService.create(createPaymentDto);
+  create(@Body() dto: CreatePaymentDto) {
+    return this.paymentsService.create(dto);
   }
 
+  @Roles(UserRole.OWNER, UserRole.ADMIN)
   @Get()
   findAll() {
     return this.paymentsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.paymentsService.findOne(+id);
+  @Roles(UserRole.OWNER, UserRole.ADMIN, UserRole.TEACHER)
+  @Get('student/:studentId')
+  findByStudent(@Param('studentId') studentId: string) {
+    return this.paymentsService.findByStudent(studentId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePaymentDto: UpdatePaymentDto) {
-    return this.paymentsService.update(+id, updatePaymentDto);
-  }
-
+  @Roles(UserRole.OWNER)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.paymentsService.remove(+id);
+    return this.paymentsService.remove(id);
   }
 }

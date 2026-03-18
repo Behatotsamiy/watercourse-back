@@ -1,4 +1,12 @@
-import { BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Group } from 'src/groups/entities/group.entity';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 export enum UserRole {
   OWNER = 'owner',
@@ -9,15 +17,15 @@ export enum UserRole {
 @Entity('users')
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string
-  
+  id: string;
+
   @Column({ unique: true })
   phone: string;
 
   @Column({ select: false })
   password: string;
 
-  @Column({ nullable: true, select: false }) 
+  @Column({ nullable: true, select: false })
   refreshToken: string | null;
 
   @Column()
@@ -37,6 +45,9 @@ export class User extends BaseEntity {
   @OneToMany(() => User, (user) => user.owner)
   staff: User[];
 
+  @OneToMany(() => Group, (group) => group.teacher)
+  groups: Group[]; // Список групп, которые ведет этот юзер (если он учитель)
+  
   // Связь с компанией (только для Owner)
   @Column({ nullable: true })
   companyName: string;
