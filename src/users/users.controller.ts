@@ -26,9 +26,9 @@ export class UsersController {
   @Post('staff')
   @ApiOperation({ summary: 'Владелец добавляет учителя или админа' })
   async createStaff(@Body() dto: CreateUserDto, @Request() req) {
+    console.log('User from token:', req.user)
     const ownerId = req.user.id;
-    const companyName = req.user.companyName
-    return this.usersService.create(dto, ownerId);
+    return this.usersService.create(dto, req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)

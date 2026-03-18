@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,25 +13,51 @@ export class UsersService {
     private userRepository: Repository<User>,
   ) {}
  async create(dto: CreateUserDto, ownerId?: string) {
-  const existingUser = await this.userRepository.findOne({ where: { phone: dto.phone } });
+  try {
+     const existingUser = await this.userRepository.findOne({ where: { phone: dto.phone } });
     if (existingUser) {
       throw new BadRequestException('Этот номер уже зарегистрирован');
     }
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const newUser = this.userRepository.create({
-      ...dto,
-      password: hashedPassword,
-     owner: ownerId ? ({ id: ownerId }) : null,
-    
-    });
-    const savedUser = await this.userRepository.save(newUser);
-    delete savedUser.password;
-    return savedUser;  }
+  // 1. Хешируем пароль
+  const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+  // 2. Создаем инстанс сущности из DTO
+  const newUser = this.userRepository.create({
+    ...dto,
+    password: hashedPassword,
+    ownerId: ownerId, // Записываем ID напрямую в колонку
+  });
+
+
+  // 4. Сохраняем
+  const savedUser = await this.userRepository.save(newUser);
+
+  const { password, ...result } = savedUser;
+  return result;
+
+  } catch (error) {
+    // Если это наша ошибка (BadRequestException), просто пробрасываем её дальше
+    if (error instanceof BadRequestException) {
+      throw error;
+    }
+
+    // Если это ошибка базы данных (например, дубликат, который мы не поймали)
+    if (error.code === '23505') { // Код ошибки уникальности в PostgreSQL
+      throw new BadRequestException('Пользователь с такими данными уже существует');
+    }
+
+    // Во всех остальных случаях логируем ошибку в консоль и выдаем 500
+    console.error('Ошибка при создании пользователя:', error);
+    throw new InternalServerErrorException('Произошла ошибка на стороне сервера');
+  }
+  }
+   
 
 
 async findAll(ownerId: string) {
   return await this.userRepository.find({
     where: { owner: { id: ownerId } },
+    relations: ['owner'],
   });
 }
 

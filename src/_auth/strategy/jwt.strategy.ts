@@ -10,12 +10,16 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: process.env.JWT_SECRET,
+      
     });
   }
 
-  async validate(payload: { sub: string; phone: string }) {
-    const user = await this.usersService.findOne(payload.sub);
-    if (!user) throw new UnauthorizedException();
-    return user;
-  }
-}
+ async validate(payload: any) {
+  console.log('JWT payload logic:', payload);
+  // Возвращаем простой объект. Теперь req.user.id — это точно строка.
+  return { 
+    id: payload.sub, 
+    phone: payload.phone, 
+    role: payload.role 
+  };
+ }}
