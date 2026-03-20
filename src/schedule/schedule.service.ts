@@ -1,3 +1,4 @@
+// src/modules/schedule/schedule.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -7,18 +8,26 @@ import { CreateScheduleDto } from './dto/create-schedule.dto';
 @Injectable()
 export class ScheduleService {
   constructor(
-    @InjectRepository(Schedule)
-    private scheduleRepository: Repository<Schedule>,
+    @InjectRepository(Schedule) private scheduleRepository: Repository<Schedule>,
   ) {}
 
-  async create(dto: CreateScheduleDto) {
-    const schedule = this.scheduleRepository.create({
-      dayOfWeek: dto.dayOfWeek,
-      startTime: dto.startTime,
-      endTime: dto.endTime,
-      group: { id: dto.groupId },
-    });
-    return this.scheduleRepository.save(schedule);
+
+  async createSchedule(dto: CreateScheduleDto) {
+  const scheduleEntries = dto.dayOfWeek.map((day) => 
+      this.scheduleRepository.create({
+        dayOfWeek: day,
+        startTime: dto.startTime,
+        endTime: dto.endTime,
+        group: { id: dto.groupId } as any,
+      })
+    );
+    return this.scheduleRepository.save(scheduleEntries);
+  }
+
+  async findAll(){
+    return this.scheduleRepository.find(
+    
+    )
   }
 
   async findByGroup(groupId: string) {
@@ -29,9 +38,8 @@ export class ScheduleService {
   }
 
   async remove(id: string) {
-    const schedule = await this.scheduleRepository.findOne({ where: { id } });
-    if (!schedule) throw new NotFoundException('Расписание не найдено');
-    await this.scheduleRepository.remove(schedule);
+    const result = await this.scheduleRepository.delete(id);
+    if (result.affected === 0) throw new NotFoundException('Запись не найдена');
     return { message: 'Расписание удалено' };
   }
 }

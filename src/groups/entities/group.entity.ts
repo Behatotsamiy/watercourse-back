@@ -3,7 +3,7 @@ import { Course } from "src/courses/entities/course.entity";
 import { Schedule } from "src/schedule/entities/schedule.entity";
 import { Student } from "src/students/entities/student.entity";
 import { User } from "src/users/entities/user.entity";
-import { Column, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 
 @Entity('group')
@@ -21,11 +21,12 @@ export class Group {
     teacher: User;
 
     @ManyToMany(() => Student, (student) => student.group)
+    @JoinTable()
     students: Student[] 
 
     @OneToMany(() => Schedule, (schedule) => schedule.group)
     schedules: Schedule[]
 
-     @OneToMany(() => Attendance, (attendance) => attendance.group)
+    @OneToMany(() => Attendance, (attendance) => attendance.group)
     attendances: Schedule[]
 }

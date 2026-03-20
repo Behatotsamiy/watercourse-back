@@ -12,4 +12,11 @@ export class UpdateGroupDto {
   @IsOptional()
   @IsUUID()
   teacherId?: string;
+
+  @IsOptional()
+  @IsUUID()
+  studentId?: string;
+
+
+  
 }
