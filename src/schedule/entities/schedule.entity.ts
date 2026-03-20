@@ -6,8 +6,8 @@ export class Schedule {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'int' }) // 1 - Понедельник, 7 - Воскресенье
-  dayOfWeek: number;
+  @Column({type :"varchar"})
+  dayOfWeek: string;
 
   @Column({ type: 'time' }) // Например, '14:00'
   startTime: string;
