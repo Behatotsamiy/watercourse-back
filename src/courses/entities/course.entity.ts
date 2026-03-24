@@ -13,6 +13,9 @@ export class Course {
     @Column()
     length: string
 
+    @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+    price: number
+
     @OneToMany(() => Group, (group) => group.course )
     groups: Group[]
 }
