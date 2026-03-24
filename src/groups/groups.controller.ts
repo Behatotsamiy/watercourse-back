@@ -37,12 +37,6 @@ export class GroupsController {
     return this.groupsService.update(id, dto);
   }
 
-  @Roles(UserRole.OWNER, UserRole.ADMIN)
-  @Post(':id/schedule')
-  async addSchedule(@Param('id') id: string, @Body() dto: CreateScheduleDto) {
-    dto.groupId = id; // Привязываем ID из URL
-    return this.groupsService.addScheduleToGroup(dto);
-  }
 
   @Roles(UserRole.OWNER, UserRole.ADMIN)
   @Post(':id/students')
