@@ -13,43 +13,20 @@ export class UsersService {
     private userRepository: Repository<User>,
   ) {}
  async create(dto: CreateUserDto, ownerId?: string) {
-  try {
      const existingUser = await this.userRepository.findOne({ where: { phone: dto.phone } });
     if (existingUser) {
       throw new BadRequestException('Этот номер уже зарегистрирован');
     }
-  // 1. Хешируем пароль
   const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-  // 2. Создаем инстанс сущности из DTO
   const newUser = this.userRepository.create({
     ...dto,
     password: hashedPassword,
-    ownerId: ownerId, // Записываем ID напрямую в колонку
+    ownerId: ownerId, 
   });
-
-
-  // 4. Сохраняем
   const savedUser = await this.userRepository.save(newUser);
-
   const { password, ...result } = savedUser;
   return result;
-
-  } catch (error) {
-    // Если это наша ошибка (BadRequestException), просто пробрасываем её дальше
-    if (error instanceof BadRequestException) {
-      throw error;
-    }
-
-    // Если это ошибка базы данных (например, дубликат, который мы не поймали)
-    if (error.code === '23505') { // Код ошибки уникальности в PostgreSQL
-      throw new BadRequestException('Пользователь с такими данными уже существует');
-    }
-
-    // Во всех остальных случаях логируем ошибку в консоль и выдаем 500
-    console.error('Ошибка при создании пользователя:', error);
-    throw new InternalServerErrorException('Произошла ошибка на стороне сервера');
-  }
   }
    
 

@@ -18,7 +18,6 @@ export class GroupsService {
   ) {}
 
   async create(dto: CreateGroupDto, scheduleDto: CreateScheduleDto) {
-    // 1. Сначала сохраняем саму группу
     const group = await this.groupRepository.save(
       this.groupRepository.create({
         groupName: dto.groupName,
@@ -27,20 +26,15 @@ export class GroupsService {
       }),
     );
 
-    // 2. Если прислали данные расписания, создаем его
     if (scheduleDto) {
       scheduleDto.groupId = group.id;
       await this.scheduleService.createSchedule(scheduleDto);
     }
 
-    return this.findOne(group.id); // Возвращаем уже со связями
+    return this.findOne(group.id); 
   }
 
-  async addScheduleToGroup(dto: CreateScheduleDto) {
-    const group = await this.groupRepository.findOne({ where: { id: dto.groupId } });
-    if (!group) throw new NotFoundException('Группа не найдена');
-    return this.scheduleService.createSchedule(dto);
-  }
+
 
   async findAll() {
     return this.groupRepository.find({

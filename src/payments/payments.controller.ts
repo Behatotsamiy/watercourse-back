@@ -13,8 +13,8 @@ export class PaymentsController {
 
   @Roles(UserRole.OWNER, UserRole.ADMIN)
   @Post()
-  create(@Body() dto: CreatePaymentDto) {
-    return this.paymentsService.create(dto);
+  create(@Body() dto: CreatePaymentDto,studentId: string ) {
+    return this.paymentsService.create(dto, studentId);
   }
 
   @Roles(UserRole.OWNER, UserRole.ADMIN)

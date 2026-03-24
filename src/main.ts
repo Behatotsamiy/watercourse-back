@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser'; 
+import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,6 +13,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   // 2. Глобальная валидация (авто-проверка DTO)
+  app.useGlobalFilters(new AllExceptionsFilter());
     app.useGlobalPipes(
     new ValidationPipe  ({
       transform: true,
