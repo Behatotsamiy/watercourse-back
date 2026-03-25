@@ -15,7 +15,7 @@ export class ScheduleService {
   async createSchedule(dto: CreateScheduleDto) {
   const scheduleEntries = dto.dayOfWeek.map((day) => 
       this.scheduleRepository.create({
-        dayOfWeek: day,
+        dayOfWeek: String(day),
         startTime: dto.startTime,
         endTime: dto.endTime,
         group: { id: dto.groupId } as any,
