@@ -21,20 +21,15 @@ export class PaymentsService {
     private studentRepository: Repository<Student>, // 👈
   ) {}
 
-  async create(dto: CreatePaymentDto, studentId: string) {
-    const student = await this.studentRepository.findOne({
-      where: { id: dto.studentId },
-    });
-    if (!student) throw new NotFoundException('Студент не найден');
-
-    const payment = this.paymentRepository.create({
-      amount: dto.amount,
-      method: dto.method,
-      comment: dto.comment,
-      student: { id: dto.studentId },
-    });
-    return this.paymentRepository.save(payment);
-  }
+ async create(dto: CreatePaymentDto) {
+  const payment = this.paymentRepository.create({
+    amount: dto.amount,
+    method: dto.method,
+    comment: dto.comment,
+    student: { id: dto.studentId },
+  });
+  return this.paymentRepository.save(payment);
+}
 
   async findByStudent(studentId: string) {
     return this.paymentRepository.find({

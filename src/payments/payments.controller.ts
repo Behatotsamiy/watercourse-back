@@ -11,11 +11,11 @@ import { UserRole } from '../users/entities/user.entity';
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
-  @Roles(UserRole.OWNER, UserRole.ADMIN)
-  @Post()
-  create(@Body() dto: CreatePaymentDto,studentId: string ) {
-    return this.paymentsService.create(dto, studentId);
-  }
+@Roles(UserRole.OWNER, UserRole.ADMIN)
+@Post()
+create(@Body() dto: CreatePaymentDto) {
+  return this.paymentsService.create(dto);
+}
 
   @Roles(UserRole.OWNER, UserRole.ADMIN)
   @Get()
