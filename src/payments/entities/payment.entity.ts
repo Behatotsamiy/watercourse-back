@@ -27,4 +27,6 @@ export class Payment {
 
   @ManyToOne(() => Student, (student) => student.payments)
   student: Student;
+
+ 
 }
