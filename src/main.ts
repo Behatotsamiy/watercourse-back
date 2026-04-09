@@ -46,11 +46,23 @@ const document = SwaggerModule.createDocument(app, config);
 SwaggerModule.setup('api/docs', app, document);
 
   // 3. CORS для твоего React-фронта
-  app.enableCors({
-    origin: 'http://localhost:5173', 
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
-  });
+const allowedOrigins = [
+  'https://watercoursecrm.netlify.app',
+  'http://localhost:5173',
+  'http://localhost:3000'
+];
+
+app.enableCors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  credentials: true,
+});
 
   await app.listen(process.env.PORT ?? 3000);
 }
