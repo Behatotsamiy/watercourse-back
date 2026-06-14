@@ -47,6 +47,10 @@ import { User } from './users/entities/user.entity';
           synchronize: true,
           logging: true,
           uuidExtension: 'pgcrypto',
+          url: process.env.DATABASE_URL,
+          ssl: {
+    rejectUnauthorized: false, // Обязательно для Neon!
+  },
         };
       },
     }),UsersModule, StudentsModule, AuthModule, GroupsModule, PaymentsModule, CoursesModule, AttendanceModule, ScheduleModule],
