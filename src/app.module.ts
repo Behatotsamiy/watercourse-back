@@ -24,9 +24,14 @@ import { User } from './users/entities/user.entity';
 
   // Если есть строка подключения (Render / Neon), работаем по ней
 if (databaseUrl) {
+  const url = new URL(databaseUrl);
   return {
     type: 'postgres',
-    url: databaseUrl,
+    host: url.hostname,
+    port: 5432,
+    username: url.username,
+    password: url.password,
+    database: url.pathname.replace('/', ''),
     autoLoadEntities: true,
     synchronize: true,
     ssl: {
