@@ -23,19 +23,17 @@ import { User } from './users/entities/user.entity';
   const databaseUrl = configService.get('DATABASE_URL');
 
   // Если есть строка подключения (Render / Neon), работаем по ней
-  if (databaseUrl) {
-    return {
-      type: 'postgres',
-      url: databaseUrl,
-      autoLoadEntities: true,
-      synchronize: true,
-      logging: true,
-      ssl: {
-        rejectUnauthorized: false, // Критично для Neon
-      },
-      uuidExtension: 'pgcrypto',
-    };
-  }
+if (databaseUrl) {
+  return {
+    type: 'postgres',
+    url: databaseUrl,
+    autoLoadEntities: true,
+    synchronize: true,
+    ssl: {
+      rejectUnauthorized: false,
+    },
+  };
+}
 
   // Если строки нет (локалка), берем обычные переменные из .env
   return {
