@@ -20,14 +20,14 @@ export class StudentsService {
 
   async findAll() {
     return this.studentRepository.find({
-      relations: ['group', 'payments'],
+      relations: ['group', 'payments', 'attendances', 'owner'],
     });
   }
 
   async findOne(id: string) {
     const student = await this.studentRepository.findOne({
       where: { id },
-      relations: ['group', 'payments', 'attendances'],
+      relations: ['group', 'payments', 'attendances', 'owner'],
     });
     if (!student) throw new NotFoundException('Студент не найден');
     return student;
