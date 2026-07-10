@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateStudentDto} from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
@@ -22,8 +22,8 @@ export class StudentsController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.OWNER, UserRole.ADMIN, UserRole.TEACHER)
   @Get()
-  findAll() {
-    return this.studentsService.findAll();
+  findAll(@Req() req) { 
+    return this.studentsService.findAll(req.user.ownerId);
   }
 
   @UseGuards(RolesGuard)

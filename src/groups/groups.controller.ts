@@ -1,5 +1,5 @@
 // src/modules/groups/groups.controller.ts
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto, AddStudentDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
@@ -21,10 +21,10 @@ export class GroupsController {
     return this.groupsService.create(body.group, body.schedule);
   }
 
-  @Get()
-  findAll() {
-    return this.groupsService.findAll();
-  }
+ @Get()
+findAll(@Req() req) {
+  return this.groupsService.findAll(req.user.ownerId);
+}
 
   @Get(':id')
   findOne(@Param('id') id: string) {

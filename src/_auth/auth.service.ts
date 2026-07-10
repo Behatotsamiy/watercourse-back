@@ -30,7 +30,7 @@ export class AuthService {
   async login(dto: LoginDto) {
     const user = await this.userRepository.findOne({
       where: { phone: dto.phone },
-      select: ['id', 'phone', 'password', 'role', 'firstName', 'lastName'],
+      select: ['id', 'phone', 'password', 'role', 'firstName', 'lastName', 'ownerId'],
     });
 
     if (!user) throw new UnauthorizedException('Неверный номер или пароль');
@@ -75,8 +75,12 @@ export class AuthService {
 
   // ─── Вспомогательные методы ────────────────────────────────────
   private async generateTokens(userId: string, phone: string, role: string) {
-    const payload = { sub: userId, phone, role };
-
+    const payload = { 
+    sub: userId, 
+    phone: phone,
+    role: role,
+    ownerId: role === 'owner' ? userId : null // 👈
+  };
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: process.env.JWT_SECRET,

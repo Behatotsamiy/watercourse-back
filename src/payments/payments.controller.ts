@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { JwtAuthGuard } from '../_auth/guards/jwt-auth.guard';
@@ -19,9 +19,9 @@ create(@Body() dto: CreatePaymentDto) {
 
   @Roles(UserRole.OWNER, UserRole.ADMIN)
   @Get()
-  findAll() {
-    return this.paymentsService.findAll();
-  }
+findAll(@Req() req) {
+  return this.paymentsService.findAll(req.user.ownerId);
+}
 
   @Roles(UserRole.OWNER, UserRole.ADMIN, UserRole.TEACHER)
   @Get('student/:studentId')

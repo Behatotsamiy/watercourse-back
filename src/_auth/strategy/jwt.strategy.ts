@@ -15,11 +15,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
  async validate(payload: any) {
-  console.log('JWT payload logic:', payload);
-  // Возвращаем простой объект. Теперь req.user.id — это точно строка.
   return { 
     id: payload.sub, 
     phone: payload.phone, 
-    role: payload.role 
+    role: payload.role,
+    ownerId: payload.ownerId // 👈
   };
- }}
+}}
