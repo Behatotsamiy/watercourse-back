@@ -39,13 +39,16 @@ export class PaymentsService {
     });
   }
 
-  async findAll() {
-    return this.paymentRepository.find({
-      relations: ['student'],
-      order: { createdAt: 'DESC' },
-    });
-  }
-
+ async findAll(ownerId: string) {
+  return this.paymentRepository
+    .createQueryBuilder('payment')
+    .leftJoinAndSelect('payment.student', 'student')
+    .leftJoin('student.group', 'group')
+    .leftJoin('group.teacher', 'teacher')
+    .where('teacher.ownerId = :ownerId OR teacher.id = :ownerId', { ownerId })
+    .orderBy('payment.createdAt', 'DESC')
+    .getMany();
+}
   async remove(id: string) {
     const payment = await this.paymentRepository.findOne({ where: { id } });
     if (!payment) throw new NotFoundException('Платёж не найден');

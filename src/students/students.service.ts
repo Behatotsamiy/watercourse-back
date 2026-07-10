@@ -18,11 +18,15 @@ export class StudentsService {
     return this.studentRepository.save(student);
   }
 
-  async findAll() {
-    return this.studentRepository.find({
-      relations: ['group', 'payments', 'attendances', 'owner'],
-    });
-  }
+  async findAll(ownerId: string) {
+  return this.studentRepository
+    .createQueryBuilder('student')
+    .leftJoinAndSelect('student.group', 'group')
+    .leftJoinAndSelect('student.payments', 'payments')
+    .leftJoin('group.teacher', 'teacher')
+    .where('teacher.ownerId = :ownerId OR teacher.id = :ownerId', { ownerId })
+    .getMany();
+}
 
   async findOne(id: string) {
     const student = await this.studentRepository.findOne({

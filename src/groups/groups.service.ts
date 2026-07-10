@@ -36,11 +36,12 @@ export class GroupsService {
 
 
 
-  async findAll() {
-    return this.groupRepository.find({
-      relations: ['course', 'teacher', 'students', 'schedules'],
-    });
-  }
+async findAll(ownerId: string) {
+  return this.groupRepository.find({
+    where: { teacher: { ownerId } },
+    relations: ['course', 'teacher', 'students', 'schedules'],
+  });
+}
 
   async findOne(id: string) {
     const group = await this.groupRepository.findOne({
