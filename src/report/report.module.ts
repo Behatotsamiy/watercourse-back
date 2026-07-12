@@ -4,9 +4,10 @@ import { ReportController } from './report.controller';
 import { Attendance } from 'src/attendance/entities/attendance.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Student } from 'src/students/entities/student.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Payment, Attendance])], // Добавьте необходимые сущности
+  imports: [TypeOrmModule.forFeature([Payment, Attendance, Student])], // Добавьте необходимые сущности
   controllers: [ReportController],
   providers: [ReportService],
 })
