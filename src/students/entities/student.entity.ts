@@ -25,6 +25,6 @@ export class Student {
     attendances: Attendance[]
 
     @OneToMany(() => Payment, (payment) => payment.student)
-    payments: Attendance[]
+    payments: Payment[]
 }
 
