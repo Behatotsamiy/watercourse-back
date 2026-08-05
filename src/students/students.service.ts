@@ -28,14 +28,14 @@ export class StudentsService {
     .getMany();
 }
 
-  async findOne(id: string) {
-    const student = await this.studentRepository.findOne({
-      where: { id },
-      relations: ['group', 'payments', 'attendances', 'owner'],
-    });
-    if (!student) throw new NotFoundException('Студент не найден');
-    return student;
-  }
+async findOne(id: string) {
+  const student = await this.studentRepository.findOne({
+    where: { id },
+    relations: ['group', 'payments', 'attendances'], // 👈 убрал 'owner'
+  });
+  if (!student) throw new NotFoundException('Студент не найден');
+  return student;
+}
 
   async update(id: string, dto: UpdateStudentDto) {
     const student = await this.findOne(id);
