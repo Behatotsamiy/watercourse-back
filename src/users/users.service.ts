@@ -33,7 +33,7 @@ export class UsersService {
 
 async findAll(ownerId: string) {
   return await this.userRepository.find({
-    where: { owner: { id: ownerId } },
+    where: { ownerId: ownerId },
     relations: ['owner', 'groups'],
   });
 }
