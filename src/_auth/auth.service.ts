@@ -27,23 +27,23 @@ export class AuthService {
   }
 
   // ─── Логин ─────────────────────────────────────────────────────
-  async login(dto: LoginDto) {
-    const user = await this.userRepository.findOne({
-      where: { phone: dto.phone },
-      select: ['id', 'phone', 'password', 'role', 'firstName', 'lastName', 'ownerId'],
-    });
+async login(dto: LoginDto) {
+  const user = await this.userRepository.findOne({
+    where: { phone: dto.phone },
+    select: ['id', 'phone', 'password', 'role', 'firstName', 'lastName', 'ownerId'],
+  });
 
-    if (!user) throw new UnauthorizedException('Неверный номер или пароль');
+  if (!user) throw new UnauthorizedException('Неверный номер или пароль');
 
-    const passwordMatch = await bcrypt.compare(dto.password, user.password);
-    if (!passwordMatch) throw new UnauthorizedException('Неверный номер или пароль');
+  const passwordMatch = await bcrypt.compare(dto.password, user.password);
+  if (!passwordMatch) throw new UnauthorizedException('Неверный номер или пароль');
 
-    const tokens = await this.generateTokens(user.id, user.phone, user.role);
-    await this.saveRefreshToken(user.id, tokens.refreshToken);
+  const tokens = await this.generateTokens(user.id, user.phone, user.role, user.ownerId); // 👈 ownerId qo'sh
+  await this.saveRefreshToken(user.id, tokens.refreshToken);
 
-    delete user.password;
-    return { user, ...tokens };
-  }
+  delete user.password;
+  return { user, ...tokens };
+}
 
   // ─── Выход ─────────────────────────────────────────────────────
   async logout(userId: string) {
@@ -74,12 +74,12 @@ export class AuthService {
   }
 
   // ─── Вспомогательные методы ────────────────────────────────────
-  private async generateTokens(userId: string, phone: string, role: string) {
+  private async generateTokens(userId: string, phone: string, role: string, ownerId?: string) {
     const payload = { 
     sub: userId, 
     phone: phone,
     role: role,
-    ownerId: role === 'owner' ? userId : null // 👈
+    ownerId: role === 'owner' ? userId : (ownerId ?? null), // 👈 admin uchun bazadagi ownerId
   };
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
