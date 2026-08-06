@@ -47,7 +47,7 @@ SwaggerModule.setup('api/docs', app, document);
 
   // 3. CORS для твоего React-фронта
 const allowedOrigins = [
-  'https://watercoursecrm.netlify.app',
+  'https://emscrm.netlify.app',
   'http://localhost:5173',
   'http://localhost:3000'
 ];
