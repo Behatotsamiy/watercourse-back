@@ -31,12 +31,13 @@ export class UsersController {
     return this.usersService.create(dto, req.user.id);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  @ApiOperation({ summary: 'Получить список всех сотрудников' })
-  findAll(@Request() req) {
-    return this.usersService.findAll(req.user.id);
-  }
+@UseGuards(JwtAuthGuard)
+@Get()
+@ApiOperation({ summary: 'Получить список всех сотрудников' })
+findAll(@Request() req) {
+  const ownerId = req.user.role === 'owner' ? req.user.id : req.user.ownerId; // 👈
+  return this.usersService.findAll(ownerId);
+}
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
