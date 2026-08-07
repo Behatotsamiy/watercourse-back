@@ -1,6 +1,7 @@
 // src/modules/payments/entities/payment.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from "typeorm";
 import { Student } from "../../students/entities/student.entity";
+import { Group } from "src/groups/entities/group.entity";
 
 export enum PaymentMethod {
   CASH = 'cash',
@@ -27,6 +28,10 @@ export class Payment {
 
   @ManyToOne(() => Student, (student) => student.payments)
   student: Student;
+  
+  @Column({ nullable: true })
+  groupId: string;
 
- 
+  @ManyToOne(() => Group, { onDelete: 'SET NULL', nullable: true })
+  group: Group;
 }
