@@ -58,4 +58,14 @@ export class User extends BaseEntity {
   // Связь с компанией (только для Owner)
   @Column({ nullable: true })
   companyName: string;
+
+  // user.entity.ts ga qo'sh
+@Column({ nullable: true, default: 'fixed' })
+salaryType: string; // 'fixed' | 'percent' | 'fixed_percent'
+
+@Column({ type: 'decimal', precision: 10, scale: 2, nullable: true, default: 0 })
+fixedSalary: number;
+
+@Column({ type: 'decimal', precision: 5, scale: 2, nullable: true, default: 0 })
+salaryPercent: number;
 }
