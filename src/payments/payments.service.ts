@@ -45,8 +45,8 @@ export class PaymentsService {
   return this.paymentRepository
     .createQueryBuilder('payment')
     .leftJoinAndSelect('payment.student', 'student')
-    .leftJoinAndSelect('payment.group', 'group') // 👈 Guruh ma'lumotlarini ham olamiz
-    .leftJoin('student.group', 'group')
+    .leftJoinAndSelect('payment.group', 'Paymentgroup') // 👈 Guruh ma'lumotlarini ham olamiz
+    .leftJoin('student.group', 'Studentgroup')
     .leftJoin('group.teacher', 'teacher')
     .where('teacher.ownerId = :ownerId OR teacher.id = :ownerId', { ownerId })
     .orderBy('payment.createdAt', 'DESC')
@@ -66,6 +66,20 @@ async refund(dto: RefundPaymentDto) {
     if (originalPayment.amount <= 0) {
       throw new BadRequestException("Ushbu to'lov bo'yicha qaytaruvni amalga oshirib bo'lmaydi");
     }
+
+
+    // 🔴 2. ПРОВЕРКА: Проверяем, не делали ли мы уже возврат для этого платежа
+  // Ищем транзакции возврата, в комментарии которых есть ID этого платежа или проверка по балансу
+  const existingRefund = await this.paymentRepository.findOne({
+    where: {
+      student: { id: dto.studentId },
+      comment: `Возврат: ${dto.paymentId}`, // или определяем статус через поле isRefunded
+    },
+  });
+
+  if (existingRefund) {
+    throw new BadRequestException("Dlya etogo plateja uzhe bil sdelan vozvrat!");
+  }
 
     // 2. Asl to'lov qaysi guruhga tegishli bo'lsa, refund to'lovi ham o'sha guruhga birktiriladi
     const refundPayment = this.paymentRepository.create({
