@@ -5,6 +5,7 @@ import { JwtAuthGuard } from '../_auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../_auth/guards/roles.guard';
 import { Roles } from '../_auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
+import { RefundPaymentDto } from './dto/refund-payment.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('payments')
@@ -17,6 +18,11 @@ create(@Body() dto: CreatePaymentDto) {
   return this.paymentsService.create(dto);
 }
 
+@Roles(UserRole.OWNER, UserRole.ADMIN)
+  @Post('refund')
+  refund(@Body() dto: RefundPaymentDto) {
+    return this.paymentsService.refund(dto);
+  }
   @Roles(UserRole.OWNER, UserRole.ADMIN)
   @Get()
 findAll(@Req() req) {

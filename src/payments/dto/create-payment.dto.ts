@@ -15,4 +15,8 @@ export class CreatePaymentDto {
 
   @IsUUID()
   studentId: string;
+
+  @IsUUID()
+  @IsOptional() // Guruh ko'rsatilishi shart emas (ixtiyoriy)
+  groupId?: string;
 }
