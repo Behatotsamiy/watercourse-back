@@ -41,13 +41,13 @@ export class PaymentsService {
     });
   }
 
- async findAll(ownerId: string) {
+async findAll(ownerId: string) {
   return this.paymentRepository
     .createQueryBuilder('payment')
     .leftJoinAndSelect('payment.student', 'student')
-    .leftJoinAndSelect('payment.group', 'Paymentgroup') // 👈 Guruh ma'lumotlarini ham olamiz
-    .leftJoin('student.group', 'Studentgroup')
-    .leftJoin('group.teacher', 'teacher')
+    .leftJoinAndSelect('payment.group', 'paymentGroup') // Использовали camelCase: paymentGroup
+    .leftJoin('student.group', 'studentGroup')
+    .leftJoin('paymentGroup.teacher', 'teacher') // 👈 Исправили: берем teacher из paymentGroup
     .where('teacher.ownerId = :ownerId OR teacher.id = :ownerId', { ownerId })
     .orderBy('payment.createdAt', 'DESC')
     .getMany();
