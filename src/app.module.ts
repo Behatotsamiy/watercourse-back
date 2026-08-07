@@ -13,6 +13,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/entities/user.entity';
 import { ReportModule } from './report/report.module';
+import { SalaryModule } from './salary/salary.module';
 
 
 @Module({
@@ -55,7 +56,7 @@ if (databaseUrl) {
     uuidExtension: 'pgcrypto',
   };
 },
-    }),UsersModule, StudentsModule, AuthModule, GroupsModule, PaymentsModule, CoursesModule, AttendanceModule, ScheduleModule, ReportModule],
+    }),SalaryModule, UsersModule, StudentsModule, AuthModule, GroupsModule, PaymentsModule, CoursesModule, AttendanceModule, ScheduleModule, ReportModule],
   controllers: [AppController],
   providers: [AppService],
 })
