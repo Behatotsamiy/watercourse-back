@@ -16,7 +16,7 @@ export class SalaryService {
   async getMonthlySalaries(ownerId: string, year: number, month: number) {
     // 1. Owner'ga tegishli barcha o'qituvchilarni ol
     const teachers = await this.userRepository.find({
-      where: { ownerId, role: 'teacher' } as any,
+      where: { ownerId: ownerId, role: 'teacher' } as any,
       relations: ['groups', 'groups.students'],
     });
 
