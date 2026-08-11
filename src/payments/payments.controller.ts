@@ -18,11 +18,10 @@ create(@Body() dto: CreatePaymentDto) {
   return this.paymentsService.create(dto);
 }
 
-@Roles(UserRole.OWNER, UserRole.ADMIN)
-  @Post('refund')
-  refund(@Body() dto: RefundPaymentDto) {
-    return this.paymentsService.refund(dto);
-  }
+@Post('refund')
+async refund(@Body() dto: { paymentId: string; reason: string }) {
+  return this.paymentsService.refund(dto.paymentId, dto.reason);
+}
   @Roles(UserRole.OWNER, UserRole.ADMIN)
   @Get()
 findAll(@Req() req) {
