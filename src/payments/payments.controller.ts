@@ -19,8 +19,9 @@ create(@Body() dto: CreatePaymentDto) {
 }
 
 @Post('refund')
-async refund(@Body() dto: { paymentId: string; reason: string }) {
-  return this.paymentsService.refund(dto.paymentId, dto.reason);
+async refund(@Body() dto: { paymentId: string; reason: string }, @Req() req: any) {
+  const deletedBy = req.user.ownerId ?? req.user.id;
+  return this.paymentsService.refund(dto.paymentId, dto.reason, deletedBy);
 }
   @Roles(UserRole.OWNER, UserRole.ADMIN)
   @Get()
