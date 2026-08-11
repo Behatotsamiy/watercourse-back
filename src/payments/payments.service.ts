@@ -97,6 +97,13 @@ async refund(paymentId: string, reason: string, deletedBy: string) {
   return { message: "To'lov qaytarildi va arxivga saqlandi" };
 }
 
+async findDeleted(ownerId: string) {
+  return this.deletedPaymentRepository.find({
+    where: { deletedBy: ownerId },
+    order: { deletedAt: 'DESC' },
+  });
+}
+
   async remove(id: string) {
     const payment = await this.paymentRepository.findOne({ where: { id } });
     if (!payment) throw new NotFoundException('Платёж не найден');
