@@ -41,57 +41,47 @@ export class PaymentsService {
     });
   }
 
- async findAll(ownerId: string) {
-  return this.paymentRepository
+async findAll(ownerId: string) {
+  const payments = await this.paymentRepository
     .createQueryBuilder('payment')
+    .select('payment.id', 'id')
+    .addSelect('payment.amount', 'amount')
+    .addSelect('payment.method', 'method')
+    .addSelect('payment.comment', 'comment')
+    .addSelect('payment.createdAt', 'createdAt')
     .leftJoinAndSelect('payment.student', 'student')
-    .leftJoinAndSelect('payment.group', 'Paymentgroup') // 👈 Guruh ma'lumotlarini ham olamiz
-    .leftJoin('student.group', 'Studentgroup')
+    .leftJoin('student.group', 'group')
     .leftJoin('group.teacher', 'teacher')
-    .where('teacher.ownerId = :ownerId OR teacher.id = :ownerId', { ownerId })
+    .where('(teacher.ownerId = :ownerId OR teacher.id = :ownerId)', { ownerId })
     .orderBy('payment.createdAt', 'DESC')
-    .getMany();
+    .getRawMany();
+
+  // Deduplikatsiya
+  const seen = new Set<string>();
+  return payments.filter(p => {
+    if (seen.has(p.id)) return false;
+    seen.add(p.id);
+    return true;
+  });
 }
-async refund(dto: RefundPaymentDto) {
-    // 1. Asl to'lovni guruh relation'i bilan birga topamiz
-    const originalPayment = await this.paymentRepository.findOne({
-      where: { id: dto.paymentId, student: { id: dto.studentId } },
-      relations: ['group'],
-    });
-
-    if (!originalPayment) {
-      throw new NotFoundException("To'lov topilmadi");
-    }
-
-    if (originalPayment.amount <= 0) {
-      throw new BadRequestException("Ushbu to'lov bo'yicha qaytaruvni amalga oshirib bo'lmaydi");
-    }
-
-
-    // 🔴 2. ПРОВЕРКА: Проверяем, не делали ли мы уже возврат для этого платежа
-  // Ищем транзакции возврата, в комментарии которых есть ID этого платежа или проверка по балансу
-  const existingRefund = await this.paymentRepository.findOne({
-    where: {
-      student: { id: dto.studentId },
-      comment: `Возврат: ${dto.paymentId}`, // или определяем статус через поле isRefunded
-    },
+async refund(paymentId: string, reason: string) {
+  const original = await this.paymentRepository.findOne({
+    where: { id: paymentId },
+    relations: ['student'],
   });
 
-  if (existingRefund) {
-    throw new BadRequestException("Dlya etogo plateja uzhe bil sdelan vozvrat!");
-  }
+  if (!original) throw new NotFoundException("To'lov topilmadi");
+  if (Number(original.amount) < 0) throw new BadRequestException("Bu to'lov allaqachon qaytarilgan");
 
-    // 2. Asl to'lov qaysi guruhga tegishli bo'lsa, refund to'lovi ham o'sha guruhga birktiriladi
-    const refundPayment = this.paymentRepository.create({
-      student: { id: dto.studentId },
-      group: originalPayment.group ? { id: originalPayment.group.id } : null,
-      amount: -Math.abs(originalPayment.amount),
-      method: originalPayment.method,
-      comment: `Возврат: ${dto.reason}`,
-    });
+  const refund = this.paymentRepository.create({
+    student: { id: original.student.id },
+    amount: -Math.abs(Number(original.amount)),
+    method: original.method,
+    comment: `Qaytarish: ${reason} (asl to'lov: ${paymentId})`,
+  });
 
-    return await this.paymentRepository.save(refundPayment);
-  }
+  return this.paymentRepository.save(refund);
+}
 
   async remove(id: string) {
     const payment = await this.paymentRepository.findOne({ where: { id } });
