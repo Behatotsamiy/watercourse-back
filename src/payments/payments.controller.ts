@@ -35,6 +35,11 @@ findAll(@Req() req) {
     return this.paymentsService.findByStudent(studentId);
   }
 
+  @Get('deleted')
+async getDeleted(@Req() req: any) {
+  return this.paymentsService.findDeleted(req.user.ownerId ?? req.user.id);
+}
+
   @Roles(UserRole.OWNER)
   @Delete(':id')
   remove(@Param('id') id: string) {
