@@ -44,7 +44,7 @@ async function bootstrap() {
   .build();
 const document = SwaggerModule.createDocument(app, config);
 SwaggerModule.setup('api/docs', app, document);
-
+2
   // 3. CORS для твоего React-фронта
 const allowedOrigins = [
   'https://emscrm.netlify.app',
